@@ -52,7 +52,6 @@
     <Compile Include="AboutForms.Designer.cs">
       <DependentUpon>AboutForms.cs</DependentUpon>
     </Compile>
-    <Compile Include="LightsOutGame.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
