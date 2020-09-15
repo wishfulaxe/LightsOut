@@ -12,19 +12,19 @@ namespace LightsOut
 {
     public partial class MainForm : Form
     {
-        private LightsOutGame lightsOutGame;
         public MainForm()
         {
             InitializeComponent();
             
 
-            lightsOutGame = new LightsOutGame();
-
-            // Default to 3x3 grid
-            x3ToolStripMenuItem.Checked = true;
+            lightsOutGame.NewGame();
         }
 
-      
+        private LightsOutGame lightsOutGame;
+        private const int GridOffset = 25; // Distance from upper-left side of window
+        private const int GridLength = 200; // Size in pixels of grid
+        
+     
 
         private void MainForm_Load(object sender, EventArgs e)
         {
@@ -54,9 +54,9 @@ namespace LightsOut
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-            for (int r = 0; r < lightsOutGame.gridSize; r++)
+            for (int r = 0; r < lightsOutGame.GridSize; r++)
             {
-                for (int c = 0; c < lightsOutGame.gridSize; c++)
+                for (int c = 0; c < lightsOutGame.GridSize; c++)
                 {
                     // Get proper pen and brush for on/off
                     // grid section
@@ -73,11 +73,11 @@ namespace LightsOut
                         brush = Brushes.Black; // Off
                     }
                     // Determine (x,y) coord of row and col to draw rectangle
-                    int x = c * CellLength + GridOffset;
-                    int y = r * CellLength + GridOffset;
+                    int x = c * lightsOutGame.GridSize + GridOffset;
+                    int y = r * lightsOutGame.GridSize + GridOffset;
                     // Draw outline and inner rectangle
-                    g.DrawRectangle(pen, x, y, lightsOutGame.gridSize, lightsOutGame.gridSize);
-                    g.FillRectangle(brush, x + 1, y + 1, lightsOutGame.gridSize - 1, lightsOutGame.gridSize - 1);
+                    g.DrawRectangle(pen, x, y, lightsOutGame.GridSize, lightsOutGame.GridSize);
+                    g.FillRectangle(brush, x + 1, y + 1, lightsOutGame.GridSize - 1, lightsOutGame.GridSize - 1);
                 }
             }
         }
@@ -86,11 +86,11 @@ namespace LightsOut
         {
             bool temp = true;
             // Write the function code here
-            for(int r=0; r<NumCells;r++)
+            for(int r=0; r< lightsOutGame.GridSize; r++)
             {
-                for(int c=0; c<NumCells; c++)
+                for(int c=0; c< lightsOutGame.GridSize; c++)
                 {
-                    if(grid[r, c]==true)
+                    if(lightsOutGame.GetGridValue(r, c)==true)
                     {
                         temp = false;
                     }
@@ -102,7 +102,10 @@ namespace LightsOut
         private void newGameButton_Click(object sender, EventArgs e)
         {
             // Fill grid with either white or black
-            lightsOutGame.NewGame();
+            for (int r = 0; r < lightsOutGame.GridSize; r++)
+                for (int c = 0; c < lightsOutGame.GridSize; c++)
+                    lightsOutGame.NewGame();
+            // Redraw grid
             this.Invalidate();
         } 
 
@@ -115,11 +118,12 @@ namespace LightsOut
             // Find row, col of mouse press
             int r = (e.Y - GridOffset) / lightsOutGame.GridSize;
             int c = (e.X - GridOffset) / lightsOutGame.GridSize;
-
+            
             // Invert selected box and all surrounding boxes
-            for (int i = r - 1; i <= r + 1; i++)
+             for (int i = r - 1; i <= r + 1; i++)
                 for (int j = c - 1; j <= c + 1; j++)
-                    lightsOutGame.Move(r, c);
+                    if (i >= 0 && i < lightsOutGame.GridSize && j >= 0 && j < lightsOutGame.GridSize)
+                        lightsOutGame.Move(r,c);
             // Redraw grid
             this.Invalidate();
             // Check to see if puzzle has been solved
